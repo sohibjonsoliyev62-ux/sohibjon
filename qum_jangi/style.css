@@ -1,0 +1,94 @@
+:root {
+  --sand: #e2c48f;
+  --dark: #12100c;
+  --blue: #4aa8ff;
+  --red: #ff5a4e;
+  --ui: #f4ead8;
+  --accent: #ffb42e;
+  --head: "Black Ops One", Impact, sans-serif;
+  --body: "Rubik", "Segoe UI", system-ui, sans-serif;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; background: #000; color: var(--ui); font-family: var(--body); overflow: hidden; }
+#game { position: relative; width: 100%; height: 100%; user-select: none; }
+canvas.view { display: block; width: 100%; height: 100%; }
+#loading { position: absolute; inset: 0; display: grid; place-items: center; font: 22px var(--head); background: #000; }
+
+/* ---------- HUD ---------- */
+#hud { position: absolute; inset: 0; pointer-events: none; font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0,0,0,.8); }
+#crosshair { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+#crosshair i { position: absolute; background: #b9ff6a; box-shadow: 0 0 2px #000; }
+#crosshair .t, #crosshair .b { width: 2px; height: 9px; left: -1px; }
+#crosshair .l, #crosshair .r { height: 2px; width: 9px; top: -1px; }
+#hitmarker { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; opacity: 0;
+  background: linear-gradient(45deg, transparent 45%, #fff 45% 55%, transparent 55%), linear-gradient(-45deg, transparent 45%, #fff 45% 55%, transparent 55%);
+  -webkit-mask: radial-gradient(circle, transparent 5px, #000 6px); mask: radial-gradient(circle, transparent 5px, #000 6px); }
+#hitmarker.head { background: linear-gradient(45deg, transparent 45%, var(--red) 45% 55%, transparent 55%), linear-gradient(-45deg, transparent 45%, var(--red) 45% 55%, transparent 55%); }
+#scope { position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 0, transparent 34vmin, #000 34.3vmin);
+  }
+#scope::before, #scope::after { content: ""; position: absolute; background: #000; }
+#scope::before { left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; }
+#scope::after { top: 50%; left: 0; right: 0; height: 2px; margin-top: -1px; }
+#damage { position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(200,0,0,.75) 100%); transition: opacity .25s; }
+#dmgDir { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; opacity: 0;
+  background: radial-gradient(circle at 50% 0, rgba(255,40,40,.9) 0 8px, transparent 22px); transition: opacity .6s; }
+
+.top { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: stretch; gap: 2px; }
+.top > div { background: rgba(10,10,10,.55); padding: 6px 16px; display: flex; align-items: center; gap: 10px; }
+.top b { font: 28px var(--head); }
+.top small { font-size: 11px; letter-spacing: .15em; font-weight: 800; }
+.team.blue { border-bottom: 3px solid var(--blue); } .team.blue b { color: var(--blue); }
+.team.red { border-bottom: 3px solid var(--red); } .team.red b { color: var(--red); }
+.timer { flex-direction: column; gap: 0 !important; min-width: 120px; justify-content: center; }
+.timer b { font-size: 24px; } .timer small { font-size: 9px; opacity: .7; letter-spacing: .08em; }
+
+#minimap { position: absolute; left: 16px; top: 16px; width: 180px; height: 180px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); background: rgba(0,0,0,.35); }
+#killfeed { position: absolute; right: 16px; top: 16px; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; font-size: 14px; font-weight: 600; }
+#killfeed div { background: rgba(0,0,0,.55); padding: 4px 10px; border-radius: 3px; }
+#killfeed .b { color: var(--blue); } #killfeed .r { color: var(--red); } #killfeed .w { color: #ddd; font-weight: 400; margin: 0 6px; font-size: 12px; }
+#killfeed .me { outline: 1px solid var(--accent); }
+
+.bottom-left { position: absolute; left: 20px; bottom: 20px; }
+.hp { display: flex; align-items: center; gap: 8px; } .hp span { color: var(--red); font-size: 26px; } .hp b { font: 46px var(--head); }
+.hpbar { width: 200px; height: 6px; background: rgba(255,255,255,.2); margin-top: 4px; } .hpbar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #ff5a4e, #ffd34e); transition: width .15s; }
+.bottom-right { position: absolute; right: 20px; bottom: 20px; text-align: right; }
+.weapon-name { font: 16px var(--head); letter-spacing: .1em; color: var(--accent); }
+.ammo b { font: 52px var(--head); } .ammo small { font-size: 22px; opacity: .7; margin-left: 4px; }
+.slots { display: flex; gap: 6px; justify-content: flex-end; font-size: 11px; margin-top: 4px; }
+.slots span { padding: 3px 7px; background: rgba(0,0,0,.45); opacity: .6; } .slots span.on { opacity: 1; outline: 1px solid var(--accent); }
+#reloadHint { position: absolute; left: 50%; top: 60%; transform: translateX(-50%); font: 18px var(--head); color: var(--accent); letter-spacing: .1em; }
+#deathScreen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(60,0,0,.35); }
+#deathScreen h2 { font: 44px var(--head); margin: 0; color: var(--red); } #deathScreen p { font-size: 18px; margin: 6px 0; }
+
+#scoreboard { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(760px, 92vw); background: rgba(10,10,10,.85); padding: 18px 22px; border-top: 3px solid var(--accent); }
+#scoreboard h3 { margin: 0 0 10px; font: 22px var(--head); letter-spacing: .08em; }
+.sb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; text-align: left; }
+.sb-cols table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.sb-cols th { text-align: left; font-size: 11px; letter-spacing: .12em; padding: 4px 6px; border-bottom: 2px solid currentColor; }
+.sb-cols td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.sb-cols td:not(:first-child), .sb-cols th:not(:first-child) { text-align: right; width: 44px; }
+.sb-cols table.blue th { color: var(--blue); } .sb-cols table.red th { color: var(--red); }
+.sb-cols tr.me td { color: var(--accent); font-weight: 800; }
+
+/* ---------- Menus ---------- */
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px;
+  background: linear-gradient(180deg, rgba(10,8,5,.55), rgba(10,8,5,.85)); }
+.card { width: min(640px, 100%); max-height: 100%; overflow: auto; background: rgba(20,17,12,.88); border: 1px solid rgba(226,196,143,.35);
+  border-left: 6px solid var(--accent); padding: 30px 32px; box-shadow: 0 30px 90px rgba(0,0,0,.7); }
+.card.small { width: min(400px, 100%); text-align: center; }
+.eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+h1 { font: clamp(48px, 9vw, 78px) var(--head); margin: 6px 0 8px; color: var(--sand); letter-spacing: .04em; line-height: 1; }
+h2 { font: 36px var(--head); margin: 0 0 8px; color: var(--sand); }
+.lead { line-height: 1.55; color: rgba(244,234,216,.85); margin: 0 0 18px; max-width: 52ch; }
+.controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 18px; font-size: 14px; margin-bottom: 18px; }
+kbd { display: inline-block; min-width: 18px; padding: 2px 7px; margin-right: 6px; background: var(--sand); color: var(--dark); font: 700 11px var(--body); border-radius: 3px; }
+.slider { display: flex; align-items: center; gap: 12px; font-size: 14px; margin: 8px 0; }
+.slider input { flex: 1; accent-color: var(--accent); } .slider output { width: 42px; text-align: right; font-weight: 800; }
+.cta { display: block; width: 100%; margin-top: 18px; padding: 15px; border: 0; cursor: pointer; background: var(--accent); color: var(--dark);
+  font: 22px var(--head); letter-spacing: .08em; clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%); }
+.cta:hover { filter: brightness(1.1); }
+.ghost { margin-top: 10px; background: none; border: 1px solid rgba(255,255,255,.3); color: var(--ui); padding: 10px 18px; cursor: pointer; font: 600 14px var(--body); width: 100%; }
+.cta:focus-visible, .ghost:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.muted { font-size: 12px; opacity: .6; margin: 12px 0 0; text-align: center; }
+#endMenu .sb-cols { margin: 10px 0 4px; }
+@media (max-width: 560px) { .controls { grid-template-columns: 1fr; } .sb-cols { grid-template-columns: 1fr; } #minimap { width: 120px; height: 120px; } }

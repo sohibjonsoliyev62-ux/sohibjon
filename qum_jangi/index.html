@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qum Jangi</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game">
+  <!-- 3D sahna shu yerga chiziladi -->
+
+  <div id="hud" hidden>
+    <div id="crosshair"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i></div>
+    <div id="hitmarker"></div>
+    <div id="scope" hidden></div>
+    <div id="damage"></div>
+    <div id="dmgDir"></div>
+
+    <div class="top">
+      <div class="team blue"><b id="scoreBlue">0</b><small>KO'K</small></div>
+      <div class="timer"><b id="timer">5:00</b><small>30 ta o'ldirishgacha</small></div>
+      <div class="team red"><small>QIZIL</small><b id="scoreRed">0</b></div>
+    </div>
+
+    <canvas id="minimap" width="180" height="180"></canvas>
+    <div id="killfeed"></div>
+
+    <div class="bottom-left">
+      <div class="hp"><span>♥</span><b id="hp">100</b></div>
+      <div class="hpbar"><i id="hpbar"></i></div>
+    </div>
+    <div class="bottom-right">
+      <div class="weapon-name" id="weaponName">AVTOMAT</div>
+      <div class="ammo"><b id="ammo">30</b><small id="reserve">/ 90</small></div>
+      <div class="slots"><span data-w="0">1 Avtomat</span><span data-w="1">2 To'pponcha</span><span data-w="2">3 Snayper</span></div>
+    </div>
+    <div id="reloadHint" hidden>QAYTA O'QLASH...</div>
+    <div id="deathScreen" hidden><h2>Siz halok bo'ldingiz</h2><p id="killedBy"></p><p>Qayta tug'ilish: <b id="respawnTime">3</b></p></div>
+
+    <div id="scoreboard" hidden>
+      <h3>Hisob jadvali</h3>
+      <div class="sb-cols"><table id="sbBlue"></table><table id="sbRed"></table></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="menu">
+    <div class="card">
+      <div class="eyebrow">5 ga 5 · Jamoaviy jang</div>
+      <h1>QUM JANGI</h1>
+      <p class="lead">Buxoro bozori xarobalarida Ko'k jamoa Qizil jamoaga qarshi. 30 ta o'ldirishga birinchi yetgan yoki 5 daqiqa ichida ko'proq o'ldirgan jamoa g'olib.</p>
+      <div class="controls">
+        <div><kbd>W A S D</kbd> yurish</div>
+        <div><kbd>Sichqoncha</kbd> qarash</div>
+        <div><kbd>Chap tugma</kbd> otish</div>
+        <div><kbd>O'ng tugma</kbd> nishon / optika</div>
+        <div><kbd>R</kbd> qayta o'qlash</div>
+        <div><kbd>1 2 3</kbd> qurol almashtirish</div>
+        <div><kbd>Shift</kbd> sekin yurish</div>
+        <div><kbd>Probel</kbd> sakrash</div>
+        <div><kbd>Tab</kbd> hisob jadvali</div>
+        <div><kbd>Esc</kbd> pauza</div>
+      </div>
+      <label class="slider">Sichqoncha sezgirligi <input type="range" id="sens" min="0.3" max="3" step="0.1" value="1"><output id="sensVal">1.0</output></label>
+      <label class="slider">Ovoz balandligi <input type="range" id="vol" min="0" max="1" step="0.05" value="0.6"><output id="volVal">60%</output></label>
+      <button class="cta" id="playBtn">JANGGA KIRISH</button>
+      <p class="muted" id="menuNote">Kompyuterda sichqoncha bilan o'ynash uchun mo'ljallangan.</p>
+    </div>
+  </div>
+
+  <div class="overlay" id="pauseMenu" hidden>
+    <div class="card small">
+      <h2>Pauza</h2>
+      <p class="lead">Davom etish uchun tugmani bosing.</p>
+      <button class="cta" id="resumeBtn">DAVOM ETISH</button>
+      <button class="ghost" id="quitBtn">Bosh menyu</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="endMenu" hidden>
+    <div class="card">
+      <div class="eyebrow">O'yin tugadi</div>
+      <h1 id="endTitle">G'ALABA</h1>
+      <p class="lead" id="endScore"></p>
+      <div class="sb-cols"><table id="endBlue"></table><table id="endRed"></table></div>
+      <button class="cta" id="againBtn">YANA O'YNASH</button>
+    </div>
+  </div>
+
+  <div id="loading">Yuklanmoqda...</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

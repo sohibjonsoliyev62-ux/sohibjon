@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Samarqand Osmoni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Manrope:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="c"></canvas>
+
+  <div class="hud" id="hud" hidden>
+    <div class="grp">
+      <div class="stat"><small>Ochko</small><b id="score">0</b></div>
+      <div class="stat"><small>To'lqin</small><b id="wave">1</b></div>
+      <div class="stat"><small>Kombo</small><b class="gold" id="combo">x1</b></div>
+      <div class="stat"><small>Gumbazlar</small><div class="lives" id="lives"></div></div>
+    </div>
+    <div class="btns">
+      <button class="icon-btn" id="muteBtn" aria-label="Ovozni o'chirish">♪</button>
+      <button class="icon-btn" id="pauseBtn" aria-label="Pauza">II</button>
+    </div>
+  </div>
+
+  <div class="boss" id="bossUi" hidden><small id="bossName">ULUG' ROZETKA</small><div class="bar"><i id="bossBar"></i></div></div>
+  <div class="banner" id="banner"></div>
+
+  <div class="bomb" id="bombUi" hidden>
+    <div class="meter"><i id="bombMeter"></i></div>
+    <button id="bombBtn" disabled>Bomba</button>
+  </div>
+
+  <div class="panel-wrap" id="startPanel">
+    <div class="panel">
+      <div class="eyebrow">Registon ustidagi tun</div>
+      <h1>Samarqand Osmoni</h1>
+      <p class="lead">Osmondan girih yulduzlari yog'ilmoqda. Lochin kemangizni boshqaring, gumbazlarni himoya qiling va har beshinchi to'lqinda Ulug' Rozetkani yengib o'ting.</p>
+      <div class="rules">
+        <div><kbd>Sichqoncha</kbd><span>yoki barmoq bilan kemani yurgizing</span></div>
+        <div><kbd>← → ↑ ↓</kbd><span>yoki WASD tugmalari</span></div>
+        <div><kbd>Avto</kbd><span>kema o'zi to'xtovsiz o'q uzadi</span></div>
+        <div><kbd>Probel</kbd><span>bomba: ekrandagi dushmanlarni tozalaydi</span></div>
+        <div><kbd>P</kbd><span>pauza</span></div>
+        <div><kbd>M</kbd><span>ovozni yoqish/o'chirish</span></div>
+      </div>
+      <div class="gems">
+        <span style="--c:#2fd3c7">Tarqoq o'q</span>
+        <span style="--c:#e8b64c">Tezkor</span>
+        <span style="--c:#7aa2ff">Qalqon</span>
+        <span style="--c:#ff6b9a">Gumbaz +1</span>
+      </div>
+      <button class="cta" id="startBtn">O'yinni boshlash</button>
+      <div class="muted" id="bestStart"></div>
+    </div>
+  </div>
+
+  <div class="panel-wrap" id="pausePanel" hidden>
+    <div class="panel">
+      <div class="eyebrow">Pauza</div>
+      <h2>Nafas rostlang</h2>
+      <p class="lead">O'yin to'xtatildi. Davom etish uchun tugmani bosing yoki P ni bosing.</p>
+      <button class="cta" id="resumeBtn">Davom etish</button>
+    </div>
+  </div>
+
+  <div class="panel-wrap" id="overPanel" hidden>
+    <div class="panel">
+      <div class="eyebrow" id="overEyebrow">Gumbazlar qulab tushdi</div>
+      <h2>O'yin tugadi</h2>
+      <div class="score-big" id="finalScore">0</div>
+      <div class="record" id="finalRecord"></div>
+      <button class="cta" id="againBtn">Qaytadan o'ynash</button>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

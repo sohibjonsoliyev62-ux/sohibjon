@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  :root { color-scheme: light; padding: env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px); }
+  html, body { margin: 0; }
+  body { font: 14px system-ui, sans-serif; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Sohib Market</title>
+<meta name="description" content="Mashina va mototsikllar onlayn do'koni — AI yordamchi bilan">
+<style>
+  /* Layout: sticky brand header, category rail, responsive product grid, slide-in cart + AI chat dock */
+  :root {
+    --bg: #f4f5f8;
+    --surface: #ffffff;
+    --surface-2: #eef0f5;
+    --ink: #15171c;
+    --ink-soft: #565d6b;
+    --line: #e1e4ec;
+    --brand: #1f3a8a;      /* royal indigo */
+    --brand-ink: #ffffff;
+    --accent: #e8a41c;     /* warm gold */
+    --accent-ink: #231a05;
+    --good: #1a8a52;
+    --danger: #c9442b;
+    --shadow: 0 6px 24px rgba(20, 28, 56, .10);
+    --radius: 16px;
+    --font-display: "Bricolage Grotesque", "Trebuchet MS", sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1016;
+      --surface: #171a22;
+      --surface-2: #1f232d;
+      --ink: #eef1f7;
+      --ink-soft: #a0a7b6;
+      --line: #2a2f3b;
+      --brand: #5b7cff;
+      --brand-ink: #0b1020;
+      --accent: #f2b53a;
+      --accent-ink: #231a05;
+      --good: #3ec27e;
+      --danger: #ef6a50;
+      --shadow: 0 8px 28px rgba(0, 0, 0, .45);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1016;
+    --surface: #171a22;
+    --surface-2: #1f232d;
+    --ink: #eef1f7;
+    --ink-soft: #a0a7b6;
+    --line: #2a2f3b;
+    --brand: #5b7cff;
+    --brand-ink: #0b1020;
+    --accent: #f2b53a;
+    --accent-ink: #231a05;
+    --good: #3ec27e;
+    --danger: #ef6a50;
+    --shadow: 0 8px 28px rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea { font-family: inherit; }
+
+  /* ---- header ---- */
+  .top {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+    background: var(--brand); color: var(--brand-ink);
+  }
+  .top-inner {
+    max-width: 1120px; margin: 0 auto;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .logo { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; }
+  .logo .mark {
+    width: 30px; height: 30px; border-radius: 8px; background: var(--accent); color: var(--accent-ink);
+    display: grid; place-items: center; font-size: 1.05rem; font-weight: 800;
+  }
+  .search { flex: 1 1 240px; min-width: 0; position: relative; }
+  .search input {
+    width: 100%; border: 0; border-radius: 10px; padding: 10px 12px 10px 36px; font-size: .95rem;
+    background: rgba(255,255,255,.14); color: var(--brand-ink);
+  }
+  .search input::placeholder { color: rgba(255,255,255,.7); }
+  .search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); opacity: .8; }
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+  .icon-btn {
+    border: 0; background: rgba(255,255,255,.14); color: var(--brand-ink);
+    width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; position: relative;
+  }
+  .icon-btn .badge {
+    position: absolute; top: -5px; right: -5px; background: var(--accent); color: var(--accent-ink);
+    font-size: .68rem; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px;
+    display: grid; place-items: center; padding: 0 4px; font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- hero strip ---- */
+  .hero {
+    max-width: 1120px; margin: 0 auto; padding: 20px 16px 4px;
+  }
+  .hero-card {
+    background: linear-gradient(110deg, var(--brand), color-mix(in srgb, var(--brand) 70%, #000));
+    color: var(--brand-ink); border-radius: var(--radius); padding: 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; overflow: hidden;
+  }
+  .hero-card h2 { font-size: clamp(1.3rem, 4vw, 1.9rem); }
+  .hero-card p { margin: 6px 0 0; color: rgba(255,255,255,.82); max-width: 42ch; }
+  .hero-badge {
+    display: inline-block; background: var(--accent); color: var(--accent-ink);
+    font-weight: 700; font-size: .78rem; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px;
+    letter-spacing: .02em;
+  }
+  .hero-art { flex: 0 0 auto; width: 170px; opacity: .95; }
+  @media (max-width: 560px) { .hero-art { display: none; } }
+
+  /* ---- categories ---- */
+  .cats { max-width: 1120px; margin: 0 auto; padding: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    padding: 8px 15px; border-radius: 999px; font-weight: 600; font-size: .9rem; white-space: nowrap;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ---- grid ---- */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 48px; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 10px 2px 14px; }
+  .section-head h3 { font-size: 1.15rem; }
+  .count { color: var(--ink-soft); font-size: .85rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; display: flex; flex-direction: column; transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+  .card .thumb { aspect-ratio: 16/10; background: var(--surface-2); display: grid; place-items: center; position: relative; }
+  .card .thumb svg { width: 86%; height: 86%; }
+  .tag {
+    position: absolute; top: 10px; left: 10px; background: var(--accent); color: var(--accent-ink);
+    font-size: .7rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: .02em;
+  }
+  .card .body { padding: 13px 14px 15px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .card .name { font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; }
+  .card .specs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 1px; }
+  .card .specs span { font-size: .72rem; color: var(--ink-soft); background: var(--surface-2); padding: 2px 7px; border-radius: 6px; }
+  .card .price { font-family: var(--font-display); font-weight: 800; font-size: 1.12rem; margin-top: auto; font-variant-numeric: tabular-nums; }
+  .card .price small { font-weight: 600; font-size: .72rem; color: var(--ink-soft); }
+  .add {
+    border: 0; background: var(--brand); color: var(--brand-ink); font-weight: 700;
+    padding: 10px; border-radius: 10px; font-size: .9rem; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .add:active { transform: scale(.98); }
+  .add.added { background: var(--good); }
+
+  /* ---- drawer (cart) ---- */
+  .scrim { position: fixed; inset: 0; background: rgba(8,10,18,.5); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100%; width: min(400px, 90vw); z-index: 50;
+    background: var(--surface); box-shadow: var(--shadow); transform: translateX(100%); transition: transform .24s ease;
+    display: flex; flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer header { padding: 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+  .drawer header h3 { font-size: 1.1rem; }
+  .close-x { border: 0; background: var(--surface-2); color: var(--ink); width: 34px; height: 34px; border-radius: 9px; font-size: 1.1rem; }
+  .cart-list { flex: 1; overflow-y: auto; padding: 10px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .cart-empty { color: var(--ink-soft); text-align: center; margin-top: 40px; padding: 0 20px; }
+  .cart-row { display: flex; gap: 11px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 9px; }
+  .cart-row .mini { width: 58px; height: 42px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; flex: 0 0 auto; }
+  .cart-row .mini svg { width: 90%; height: 90%; }
+  .cart-row .info { flex: 1; min-width: 0; }
+  .cart-row .info .n { font-weight: 600; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cart-row .info .p { font-size: .82rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .qty { display: flex; align-items: center; gap: 7px; }
+  .qty button { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); font-weight: 700; }
+  .qty span { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: .9rem; }
+  .drawer footer { border-top: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .total-row { display: flex; align-items: baseline; justify-content: space-between; font-family: var(--font-display); }
+  .total-row .t { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .checkout { border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 800; padding: 13px; border-radius: 11px; font-size: 1rem; }
+
+  /* ---- AI chat ---- */
+  .chat-fab {
+    position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 45;
+    border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px;
+    padding: 13px 18px; font-weight: 800; font-size: .95rem; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chat-panel {
+    position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 55;
+    width: min(380px, calc(100vw - 32px)); height: min(560px, calc(100vh - 90px));
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+    display: none; flex-direction: column; overflow: hidden;
+  }
+  .chat-panel.open { display: flex; }
+  .chat-head { background: var(--brand); color: var(--brand-ink); padding: 13px 15px; display: flex; align-items: center; gap: 10px; }
+  .chat-head .av { width: 32px; height: 32px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; }
+  .chat-head .who { flex: 1; }
+  .chat-head .who b { font-family: var(--font-display); display: block; font-size: .98rem; }
+  .chat-head .who small { opacity: .8; font-size: .72rem; }
+  .chat-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+  .msg { max-width: 85%; padding: 9px 12px; border-radius: 14px; font-size: .9rem; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+  .msg.bot { background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .msg.me { background: var(--brand); color: var(--brand-ink); border-bottom-right-radius: 4px; align-self: flex-end; }
+  .msg.bot b { color: var(--brand); }
+  .suggest { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; background: var(--bg); }
+  .suggest button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: .78rem; padding: 6px 10px; border-radius: 999px; }
+  .chat-input { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+  .chat-input textarea { flex: 1; min-width: 0; resize: none; border: 1px solid var(--line); border-radius: 11px; padding: 10px; font-size: .9rem; background: var(--bg); color: var(--ink); height: 42px; max-height: 110px; }
+  .chat-send { border: 0; background: var(--brand); color: var(--brand-ink); border-radius: 11px; width: 44px; display: grid; place-items: center; flex: 0 0 auto; }
+  .chat-send:disabled { opacity: .5; }
+  .typing { display: inline-flex; gap: 3px; }
+  .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-soft); animation: blink 1.2s infinite both; }
+  .typing i:nth-child(2){ animation-delay: .2s } .typing i:nth-child(3){ animation-delay: .4s }
+  @keyframes blink { 0%,80%,100%{ opacity:.25 } 40%{ opacity:1 } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem;
+    opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; box-shadow: var(--shadow);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .foot { max-width: 1120px; margin: 0 auto; padding: 24px 16px 90px; color: var(--ink-soft); font-size: .82rem; border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="logo"><span class="mark">S</span>Sohib Market</div>
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="search" placeholder="Mashina yoki mototsikl qidiring…" autocomplete="off">
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeBtn" title="Mavzu" aria-label="Mavzu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2M12 19v2M5 12H3M21 12h-2M6 6 4.5 4.5M19.5 19.5 18 18M18 6l1.5-1.5M4.5 19.5 6 18"/><circle cx="12" cy="12" r="4"/></svg>
+      </button>
+      <button class="icon-btn" id="cartBtn" aria-label="Savat">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L23 7H6"/></svg>
+        <span class="badge" id="cartBadge" hidden>0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-card">
+    <div>
+      <span class="hero-badge">Yangi avlod 2025</span>
+      <h2>Mashina va mototsikl — bir joyda</h2>
+      <p>Ishonchli modellar, aniq narxlar va AI yordamchi. O'zingizga mosini tanlashda Sohib yordam beradi.</p>
+    </div>
+    <div class="hero-art" id="heroArt"></div>
+  </div>
+</section>
+
+<nav class="cats" id="cats"></nav>
+
+<main class="wrap">
+  <div class="section-head">
+    <h3 id="secTitle">Barcha mahsulotlar</h3>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer class="foot">
+  <strong>Sohib Market</strong> — namunaviy onlayn do'kon. Ko'rsatilgan narxlar va modellar namuna uchun.
+  To'lov va yetkazib berish demo rejimida ishlaydi.
+</footer>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- Cart drawer -->
+<aside class="drawer" id="cart" aria-label="Savat">
+  <header>
+    <h3>Savat</h3>
+    <button class="close-x" data-close aria-label="Yopish">✕</button>
+  </header>
+  <div class="cart-list" id="cartList"></div>
+  <footer>
+    <div class="total-row"><span>Jami:</span><span class="t" id="total">0 so'm</span></div>
+    <button class="checkout" id="checkout">Rasmiylashtirish</button>
+  </footer>
+</aside>
+
+<!-- AI chat -->
+<button class="chat-fab" id="chatFab">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  Sohib AI
+</button>
+
+<section class="chat-panel" id="chatPanel" aria-label="AI yordamchi">
+  <div class="chat-head">
+    <div class="av">AI</div>
+    <div class="who"><b>Sohib yordamchi</b><small>Mashina va mototsikl bo'yicha maslahat</small></div>
+    <button class="close-x" data-close aria-label="Yopish" style="background:rgba(255,255,255,.18);color:#fff">✕</button>
+  </div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="suggest" id="suggest"></div>
+  <div class="chat-input">
+    <textarea id="chatText" placeholder="Masalan: 150 million so'mgacha oilaviy mashina kerak…" rows="1"></textarea>
+    <button class="chat-send" id="chatSend" aria-label="Yuborish">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
+    </button>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Katalog (namuna ma'lumotlar)
+// ---------------------------------------------------------------------------
+function carSVG(c1, c2) {
+  return `<svg viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="110" cy="104" rx="92" ry="8" fill="rgba(0,0,0,.08)"/>
+    <path d="M18 78 Q22 58 44 54 L74 40 Q86 34 104 34 L150 34 Q168 34 180 48 L198 60 Q206 64 206 74 L206 82 Q206 88 198 88 L22 88 Q16 88 16 82 Z" fill="${c1}"/>
+    <path d="M80 40 Q88 36 102 36 L124 36 L124 54 L74 54 Z" fill="#cfe3ff" opacity=".85"/>
+    <path d="M128 36 L148 36 Q162 37 172 48 L178 54 L128 54 Z" fill="#cfe3ff" opacity=".85"/>
+    <rect x="16" y="68" width="190" height="7" fill="${c2}" opacity=".5"/>
+    <circle cx="62" cy="88" r="17" fill="#1a1d24"/><circle cx="62" cy="88" r="8" fill="#6b7280"/>
+    <circle cx="162" cy="88" r="17" fill="#1a1d24"/><circle cx="162" cy="88" r="8" fill="#6b7280"/>
+    <rect x="196" y="62" width="10" height="7" rx="2" fill="${c2}"/>
+  </svg>`;
+}
+function motoSVG(c1, c2) {
+  return `<svg viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="110" cy="104" rx="86" ry="7" fill="rgba(0,0,0,.08)"/>
+    <circle cx="54" cy="84" r="26" fill="none" stroke="#1a1d24" stroke-width="7"/><circle cx="54" cy="84" r="5" fill="#6b7280"/>
+    <circle cx="166" cy="84" r="26" fill="none" stroke="#1a1d24" stroke-width="7"/><circle cx="166" cy="84" r="5" fill="#6b7280"/>
+    <path d="M54 84 L96 84 L120 60 L150 60 L166 84" fill="none" stroke="${c1}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M96 84 Q104 62 120 60 L146 60 Q156 60 160 70" fill="${c2}"/>
+    <path d="M150 58 L176 50 Q182 49 182 54 L176 60 Z" fill="${c1}"/>
+    <rect x="104" y="54" width="44" height="12" rx="5" fill="${c1}"/>
+    <path d="M44 66 L60 54" stroke="${c2}" stroke-width="5" stroke-linecap="round"/>
+  </svg>`;
+}
+
+const CARS = [
+  { id:"c1", cat:"car", name:"Chevrolet Onix", price:189000000, tag:"Ommabop", seats:5, fuel:"Benzin", year:2024, power:"113 o.k.", trans:"Avtomat", c1:"#2b6cb0", c2:"#1a4e86",
+    desc:"Zamonaviy sedan, tejamkor va keng salon. Shahar va uzoq yo'l uchun mos." },
+  { id:"c2", cat:"car", name:"Chevrolet Cobalt", price:152000000, tag:"Arzon", seats:5, fuel:"Benzin", year:2024, power:"105 o.k.", trans:"Mexanika", c1:"#c9442b", c2:"#9c3420",
+    desc:"Eng ommabop oilaviy sedan, katta yukxona, past sarf." },
+  { id:"c3", cat:"car", name:"Chevrolet Tracker", price:268000000, tag:"Krossover", seats:5, fuel:"Benzin", year:2024, power:"150 o.k.", trans:"Avtomat", c1:"#2f855a", c2:"#216442",
+    desc:"Ixcham krossover, baland klirens, turbo dvigatel." },
+  { id:"c4", cat:"car", name:"Chevrolet Captiva", price:339000000, tag:"7 o'rin", seats:7, fuel:"Benzin", year:2024, power:"141 o.k.", trans:"Avtomat", c1:"#4a5568", c2:"#2d3340",
+    desc:"Katta oila uchun 7 o'rinli krossover, keng salon." },
+  { id:"c5", cat:"car", name:"Chevrolet Nexia 3", price:138000000, tag:"Byudjet", seats:5, fuel:"Benzin", year:2023, power:"107 o.k.", trans:"Mexanika", c1:"#805ad5", c2:"#5f3fb0",
+    desc:"Eng hamyonbop sedan, ehtiyot qismlari arzon." },
+  { id:"c6", cat:"car", name:"Chevrolet Malibu 2", price:415000000, tag:"Biznes", seats:5, fuel:"Benzin", year:2024, power:"241 o.k.", trans:"Avtomat", c1:"#1a202c", c2:"#000000",
+    desc:"Biznes-klass sedan, kuchli turbo dvigatel va boy jihoz." },
+  { id:"c7", cat:"car", name:"Chevrolet Damas", price:98000000, tag:"Yuk uchun", seats:7, fuel:"Benzin", year:2023, power:"38 o.k.", trans:"Mexanika", c1:"#e8a41c", c2:"#b57f10",
+    desc:"Kichik furgon, savdo va yuk tashish uchun ideal." },
+  { id:"c8", cat:"car", name:"BYD Song Plus EV", price:498000000, tag:"Elektr", seats:5, fuel:"Elektr", year:2024, power:"204 o.k.", trans:"Avtomat", c1:"#0d9488", c2:"#0a6e65",
+    desc:"Elektr krossover, bir zaryadda ~500 km, tez quvvatlash." },
+];
+
+const MOTOS = [
+  { id:"m1", cat:"moto", name:"GX Moto Racer 250", price:34000000, tag:"Sport", seats:2, fuel:"Benzin", year:2024, power:"25 o.k.", trans:"6 pog'ona", c1:"#c9442b", c2:"#9c3420",
+    desc:"Sport mototsikl, 250cc dvigatel, yengil ramka." },
+  { id:"m2", cat:"moto", name:"Suzuki Address 110", price:21000000, tag:"Skuter", seats:2, fuel:"Benzin", year:2024, power:"9 o.k.", trans:"Avtomat", c1:"#2b6cb0", c2:"#1a4e86",
+    desc:"Shahar skuteri, juda tejamkor, oson boshqariladi." },
+  { id:"m3", cat:"moto", name:"Bajaj Boxer 150", price:18500000, tag:"Arzon", seats:2, fuel:"Benzin", year:2023, power:"13 o.k.", trans:"5 pog'ona", c1:"#2f855a", c2:"#216442",
+    desc:"Ishonchli kundalik mototsikl, past sarf, chidamli." },
+  { id:"m4", cat:"moto", name:"Yamaha YZF R15", price:52000000, tag:"Premium", seats:2, fuel:"Benzin", year:2024, power:"19 o.k.", trans:"6 pog'ona", c1:"#1a202c", c2:"#000000",
+    desc:"Yengil sport-bike, aniq boshqaruv, zamonaviy dizayn." },
+  { id:"m5", cat:"moto", name:"Segway E110 Electric", price:27000000, tag:"Elektr", seats:2, fuel:"Elektr", year:2024, power:"ekvivalent 7 o.k.", trans:"Avtomat", c1:"#0d9488", c2:"#0a6e65",
+    desc:"Elektr skuter, shovqinsiz, bir zaryadda ~90 km." },
+  { id:"m6", cat:"moto", name:"Honda CB 190R", price:44000000, tag:"Neo-klassik", seats:2, fuel:"Benzin", year:2024, power:"17 o.k.", trans:"6 pog'ona", c1:"#805ad5", c2:"#5f3fb0",
+    desc:"Neo-klassik naked-bike, kuchli va qulay posadka." },
+];
+
+const PRODUCTS = [...CARS, ...MOTOS];
+const byId = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
+function svgFor(p){ return p.cat === "car" ? carSVG(p.c1, p.c2) : motoSVG(p.c1, p.c2); }
+function fmt(n){ return n.toLocaleString("ru-RU").replace(/,/g," ") + " so'm"; }
+
+const CATS = [
+  { key:"all", label:"Barchasi" },
+  { key:"car", label:"🚗 Mashinalar" },
+  { key:"moto", label:"🏍️ Mototsikllar" },
+  { key:"ev", label:"⚡ Elektr" },
+];
+
+// ---------------------------------------------------------------------------
+// Holat
+// ---------------------------------------------------------------------------
+let activeCat = "all";
+let query = "";
+let cart = loadCart();
+
+function loadCart(){
+  try { return JSON.parse(localStorage.getItem("sohib_cart") || "{}"); }
+  catch { return {}; }
+}
+function saveCart(){
+  try { localStorage.setItem("sohib_cart", JSON.stringify(cart)); } catch {}
+}
+
+// ---------------------------------------------------------------------------
+// Render: kategoriyalar, grid
+// ---------------------------------------------------------------------------
+const catsEl = document.getElementById("cats");
+CATS.forEach(c => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = c.label; b.setAttribute("aria-pressed", c.key === activeCat);
+  b.onclick = () => { activeCat = c.key; query = ""; document.getElementById("search").value = ""; renderCats(); renderGrid(); };
+  b.dataset.key = c.key;
+  catsEl.appendChild(b);
+});
+function renderCats(){
+  [...catsEl.children].forEach(b => b.setAttribute("aria-pressed", b.dataset.key === activeCat));
+}
+
+function matches(p){
+  let ok = true;
+  if (activeCat === "car") ok = p.cat === "car";
+  else if (activeCat === "moto") ok = p.cat === "moto";
+  else if (activeCat === "ev") ok = p.fuel === "Elektr";
+  if (ok && query){
+    const q = query.toLowerCase();
+    ok = (p.name + " " + p.desc + " " + p.fuel + " " + p.tag).toLowerCase().includes(q);
+  }
+  return ok;
+}
+
+const grid = document.getElementById("grid");
+function renderGrid(){
+  const list = PRODUCTS.filter(matches);
+  const titles = { all:"Barcha mahsulotlar", car:"Mashinalar", moto:"Mototsikllar", ev:"Elektr transport" };
+  document.getElementById("secTitle").textContent = query ? `“${query}” bo'yicha` : titles[activeCat];
+  document.getElementById("count").textContent = list.length + " ta mahsulot";
+  grid.innerHTML = "";
+  if (!list.length){
+    grid.innerHTML = `<p style="color:var(--ink-soft);padding:20px 2px">Hech narsa topilmadi. Boshqa so'z bilan qidiring yoki Sohib AI dan so'rang.</p>`;
+    return;
+  }
+  for (const p of list){
+    const inCart = cart[p.id];
+    const el = document.createElement("article");
+    el.className = "card";
+    el.innerHTML = `
+      <div class="thumb"><span class="tag">${p.tag}</span>${svgFor(p)}</div>
+      <div class="body">
+        <div class="name">${p.name}</div>
+        <div class="specs">
+          <span>${p.year}</span><span>${p.fuel}</span><span>${p.power}</span><span>${p.trans}</span><span>${p.seats} o'rin</span>
+        </div>
+        <div class="price">${fmt(p.price)}</div>
+        <button class="add ${inCart ? "added" : ""}" data-add="${p.id}">
+          ${inCart ? "✓ Savatda" : "Savatga qo'shish"}
+        </button>
+      </div>`;
+    grid.appendChild(el);
+  }
+}
+
+grid.addEventListener("click", e => {
+  const id = e.target.closest("[data-add]")?.dataset.add;
+  if (id){ addToCart(id); }
+});
+
+// ---------------------------------------------------------------------------
+// Savat
+// ---------------------------------------------------------------------------
+function addToCart(id, qty = 1){
+  cart[id] = (cart[id] || 0) + qty;
+  saveCart(); renderCart(); renderGrid();
+  toast(byId[id].name + " savatga qo'shildi");
+}
+function setQty(id, n){
+  if (n <= 0) delete cart[id]; else cart[id] = n;
+  saveCart(); renderCart(); renderGrid();
+}
+function cartCount(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
+function cartTotal(){ return Object.entries(cart).reduce((s,[id,q])=> s + byId[id].price*q, 0); }
+
+const cartList = document.getElementById("cartList");
+function renderCart(){
+  const n = cartCount();
+  const badge = document.getElementById("cartBadge");
+  badge.hidden = n === 0; badge.textContent = n;
+  const entries = Object.entries(cart);
+  if (!entries.length){
+    cartList.innerHTML = `<p class="cart-empty">Savat bo'sh.<br>Mahsulot qo'shing yoki Sohib AI dan tavsiya so'rang.</p>`;
+  } else {
+    cartList.innerHTML = "";
+    for (const [id, q] of entries){
+      const p = byId[id];
+      const row = document.createElement("div");
+      row.className = "cart-row";
+      row.innerHTML = `
+        <div class="mini">${svgFor(p)}</div>
+        <div class="info"><div class="n">${p.name}</div><div class="p">${fmt(p.price)}</div></div>
+        <div class="qty">
+          <button data-dec="${id}" aria-label="Kamaytirish">−</button>
+          <span>${q}</span>
+          <button data-inc="${id}" aria-label="Oshirish">+</button>
+        </div>`;
+      cartList.appendChild(row);
+    }
+  }
+  document.getElementById("total").textContent = fmt(cartTotal());
+}
+cartList.addEventListener("click", e => {
+  const inc = e.target.closest("[data-inc]")?.dataset.inc;
+  const dec = e.target.closest("[data-dec]")?.dataset.dec;
+  if (inc) setQty(inc, cart[inc] + 1);
+  if (dec) setQty(dec, cart[dec] - 1);
+});
+
+document.getElementById("checkout").onclick = () => {
+  if (!cartCount()){ toast("Savat bo'sh"); return; }
+  toast("Buyurtma qabul qilindi! (demo)");
+  cart = {}; saveCart(); renderCart(); renderGrid(); closeAll();
+};
+
+// ---------------------------------------------------------------------------
+// Drawer / scrim / theme / toast
+// ---------------------------------------------------------------------------
+const scrim = document.getElementById("scrim");
+function openCart(){ document.getElementById("cart").classList.add("open"); scrim.classList.add("open"); }
+function closeAll(){ document.getElementById("cart").classList.remove("open"); scrim.classList.remove("open"); }
+document.getElementById("cartBtn").onclick = openCart;
+scrim.onclick = closeAll;
+document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { closeAll(); document.getElementById("chatPanel").classList.remove("open"); });
+
+const search = document.getElementById("search");
+search.addEventListener("input", () => { query = search.value.trim(); if (query && activeCat!=="all"){ activeCat="all"; renderCats(); } renderGrid(); });
+
+const root = document.documentElement;
+document.getElementById("themeBtn").onclick = () => {
+  const dark = root.getAttribute("data-theme") === "dark"
+    || (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+  root.setAttribute("data-theme", dark ? "light" : "dark");
+};
+
+let toastT;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(()=> t.classList.remove("show"), 2200);
+}
+
+document.getElementById("heroArt").innerHTML = carSVG("#ffffff", "#e8a41c");
+
+// ---------------------------------------------------------------------------
+// AI yordamchi (sample imkoniyati)
+// ---------------------------------------------------------------------------
+const chatPanel = document.getElementById("chatPanel");
+const chatLog = document.getElementById("chatLog");
+const chatText = document.getElementById("chatText");
+const chatSend = document.getElementById("chatSend");
+let sampleApi = null, sampleTried = false, history = [], busy = false;
+
+const SUGGESTIONS = [
+  "150 mln so'mgacha oilaviy mashina",
+  "Shahar uchun arzon mototsikl",
+  "Elektr transport bormi?",
+  "7 o'rinli mashina kerak",
+];
+function renderSuggest(){
+  const s = document.getElementById("suggest");
+  s.innerHTML = "";
+  SUGGESTIONS.forEach(txt => {
+    const b = document.createElement("button");
+    b.textContent = txt; b.onclick = () => { chatText.value = txt; sendChat(); };
+    s.appendChild(b);
+  });
+}
+
+function catalogContext(){
+  return PRODUCTS.map(p =>
+    `- ${p.name} [${p.cat==="car"?"mashina":"mototsikl"}], narx: ${p.price.toLocaleString("ru-RU")} so'm, ` +
+    `${p.fuel}, ${p.power}, ${p.trans}, ${p.seats} o'rin, ${p.year}-yil. ${p.desc}`
+  ).join("\n");
+}
+const SYSTEM = `Sen "Sohib Market" onlayn do'konining yordamchisisan. Do'konda faqat mashina va mototsikllar sotiladi.
+Vazifang: mijozga ehtiyojiga mos transport tanlashda yordam berish, savollariga javob berish.
+Qoidalar:
+- Faqat o'zbek tilida, qisqa va samimiy javob ber.
+- Faqat quyidagi katalogdagi mahsulotlarni tavsiya qil, boshqa modellarni o'ylab topma.
+- Mahsulotni tavsiya qilganda nomini va narxini aniq ayt.
+- Byudjet berilsa, shu narxga mos variantlarni tanlab ber.
+- 2-3 tadan ortiq variant tavsiya qilma.
+- Do'konda qurol sotilmaydi; bunday so'rovga faqat mashina va mototsikl borligini ayt.
+
+KATALOG:
+${catalogContext()}`;
+
+function addMsg(role, text){
+  const d = document.createElement("div");
+  d.className = "msg " + (role === "me" ? "me" : "bot");
+  d.innerHTML = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>");
+  chatLog.appendChild(d);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  return d;
+}
+function localRecommend(q){
+  const ql = q.toLowerCase();
+  const budget = (ql.match(/(\d[\d\s.,]*)\s*(mln|million|mln\.|млн)/) ? parseFloat(ql.replace(/[^\d]/g," ").trim().split(/\s+/)[0])*1000000 : null);
+  let pool = PRODUCTS.slice();
+  if (/moto|mototsikl|skuter|bike|motor/.test(ql)) pool = pool.filter(p=>p.cat==="moto");
+  if (/mashina|avto|sedan|krossover|car/.test(ql)) pool = pool.filter(p=>p.cat==="car");
+  if (/elektr|electric|ev|zaryad/.test(ql)) pool = PRODUCTS.filter(p=>p.fuel==="Elektr");
+  if (/7|oila|katta/.test(ql)) { const s = pool.filter(p=>p.seats>=7); if (s.length) pool = s; }
+  if (budget) pool = pool.filter(p=>p.price<=budget);
+  pool.sort((a,b)=>a.price-b.price);
+  return pool.slice(0,3);
+}
+
+async function ensureSample(){
+  if (sampleTried) return sampleApi;
+  sampleTried = true;
+  try { sampleApi = window.claude?.use ? await window.claude.use("sample") : null; }
+  catch { sampleApi = null; }
+  return sampleApi;
+}
+
+async function sendChat(){
+  const text = chatText.value.trim();
+  if (!text || busy) return;
+  chatText.value = ""; chatText.style.height = "42px";
+  addMsg("me", text);
+  history.push({ role:"user", content:text });
+  busy = true; chatSend.disabled = true;
+
+  const thinking = addMsg("bot", "");
+  thinking.innerHTML = `<span class="typing"><i></i><i></i><i></i></span>`;
+
+  const api = await ensureSample();
+  if (api){
+    try {
+      const msgs = history.slice(-8);
+      const prompt = [{ role:"user", content: SYSTEM + "\n\nSUHBAT:\n" +
+        msgs.map(m => (m.role==="user"?"Mijoz: ":"Sohib: ")+m.content).join("\n") +
+        "\n\nShu so'nggi xabarga Sohib yordamchi sifatida javob ber:" }];
+      let answer = "";
+      const res = await api(prompt, {
+        modelTier: "quick",
+        cache: false,
+        onText: ({ text }) => {
+          answer = text;
+          thinking.innerHTML = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>");
+          chatLog.scrollTop = chatLog.scrollHeight;
+        }
+      });
+      answer = (res && res.text) || answer;
+      if (!answer) throw new Error("bo'sh javob");
+      thinking.innerHTML = answer.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>");
+      history.push({ role:"assistant", content: answer });
+    } catch (err) {
+      fallbackAnswer(text, thinking);
+    }
+  } else {
+    fallbackAnswer(text, thinking);
+  }
+  busy = false; chatSend.disabled = false; chatText.focus();
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function fallbackAnswer(text, node){
+  const recs = localRecommend(text);
+  let msg;
+  if (recs.length){
+    msg = "Mana sizga mos variantlar:\n" + recs.map(p => `• **${p.name}** — ${fmt(p.price)} (${p.power}, ${p.seats} o'rin)`).join("\n")
+      + "\n\nBatafsil ma'lumot kerakmi yoki savatga qo'shamizmi?";
+  } else {
+    msg = "Hozircha aniq moslik topilmadi. Do'konimizda mashina va mototsikllar bor — byudjetingizni yoki qanday transport kerakligini ayting.";
+  }
+  node.innerHTML = msg.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>");
+  history.push({ role:"assistant", content: msg });
+}
+
+document.getElementById("chatFab").onclick = async () => {
+  chatPanel.classList.add("open");
+  if (!chatLog.children.length){
+    addMsg("bot", "Assalomu alaykum! Men Sohib — do'kon yordamchisiman. 🚗🏍️\nQanday transport qidiryapsiz? Byudjetingizni ayting, mosini tanlab beraman.");
+    renderSuggest();
+  }
+  chatText.focus();
+};
+chatSend.onclick = sendChat;
+chatText.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendChat(); }
+});
+chatText.addEventListener("input", () => {
+  chatText.style.height = "42px";
+  chatText.style.height = Math.min(chatText.scrollHeight, 110) + "px";
+});
+
+// ---------------------------------------------------------------------------
+renderCats(); renderGrid(); renderCart();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Face ID: shaxsiy ma'lumotlar (yuzlar bazasi, kelganlar jurnali, notanishlar rasmi)
+face_id/faces_db.npz
+face_id/jurnal.csv
+face_id/notanishlar/
+
+# Face ID modellari birinchi ishga tushganda o'zi yuklab olinadi
+face_id/models/
