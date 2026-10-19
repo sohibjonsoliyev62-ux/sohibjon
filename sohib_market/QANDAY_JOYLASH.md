@@ -5,7 +5,7 @@ server yoki dastur kerak emas, oddiy brauzerda ham ochiladi.
 
 ## Eng oson yo'l — Netlify Drop (bepul, 1 daqiqa)
 1. Brauzerda **https://app.netlify.com/drop** ni oching.
-2. Shu `sohib_market_site` papkasini (yoki `index.html` faylni) sahifaga
+2. Shu `sohib_market` papkasini (yoki `index.html` faylni) sahifaga
    **sudrab tashlang** (drag & drop).
 3. Netlify sizga darhol manzil beradi, masalan `https://sohib-market.netlify.app`.
    Shu havolani istalgan odamga yuborsangiz bo'ladi.
@@ -13,8 +13,9 @@ server yoki dastur kerak emas, oddiy brauzerda ham ochiladi.
    `.netlify.app` manzilini o'zgartira olasiz.
 
 ## Boshqa bepul variantlar
-- **GitHub Pages:** GitHub'da repozitoriy oching, `index.html` ni yuklang,
-  Settings → Pages dan yoqing.
+- **GitHub Pages (allaqachon sozlangan):** repozitoriyda Settings → Pages →
+  Branch: `main`, papka `/ (root)` → Save. Sayt manzili:
+  https://sohibjonsoliyev62-ux.github.io/sohibjon/sohib_market/
 - **Vercel:** vercel.com ga papkani yuklang.
 - **O'z domeningiz** (masalan `sohibmarket.uz`): domen sotib olib, shu
   hostinglardan biriga ulaysiz.
