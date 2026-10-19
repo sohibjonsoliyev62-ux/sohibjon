@@ -7,6 +7,8 @@ venv/
 face_id/faces_db.npz
 face_id/jurnal.csv
 face_id/notanishlar/
+face_id/odamlar/
+face_id/odamlar_import.txt
 
 # Face ID modellari birinchi ishga tushganda o'zi yuklab olinadi
 face_id/models/

@@ -1,12 +1,14 @@
 # Sohibjon Soliyev — loyihalar
 
+🎮 **Onlayn o'ynash:** https://sohibjonsoliyev62-ux.github.io/sohibjon/
+
 | Loyiha | Tavsif | Texnologiya |
 |---|---|---|
 | [AI Virtual Mouse](#ai-virtual-mouse) | Qo'l harakati bilan sichqonchani boshqarish | Python, OpenCV, MediaPipe |
 | [Face ID](face_id/) | Yuzni real vaqtda tanish va kompyuterni himoyalash | Python, OpenCV |
-| [Qum Jangi](qum_jangi/) | Brauzerda 3D FPS o'yin | JavaScript, Three.js |
-| [Samarqand Osmoni](samarqand_osmoni/) | Arkada shuter o'yin | JavaScript, Canvas |
-| [Sohib Market](sohib_market/) | Internet-do'kon sayti | HTML, CSS, JavaScript |
+| [Qum Jangi](qum_jangi/) · [▶ o'ynash](https://sohibjonsoliyev62-ux.github.io/sohibjon/qum_jangi/) | Brauzerda 3D FPS o'yin | JavaScript, Three.js |
+| [Samarqand Osmoni](samarqand_osmoni/) · [▶ o'ynash](https://sohibjonsoliyev62-ux.github.io/sohibjon/samarqand_osmoni/) | Arkada shuter o'yin | JavaScript, Canvas |
+| [Sohib Market](sohib_market/) · [▶ ochish](https://sohibjonsoliyev62-ux.github.io/sohibjon/sohib_market/) | Internet-do'kon sayti | HTML, CSS, JavaScript |
 
 ---
 
@@ -71,6 +73,7 @@ python main.py --camera 1 --smooth 7 --margin 0.2 --scroll 3
 - `PyAutoGuiMouse` — sichqonchani boshqaruvchi adapter
 - `draw_hud` — ekrandagi FPS, rejim va yordam paneli
 - `main_eski.py` — loyihaning oldingi versiyasi
+- `face_id/heart.py` — turtle bilan yurak chizadigan kichik dastur (Face ID'ga aloqasi yo'q)
 
 ## Muammolar
 
